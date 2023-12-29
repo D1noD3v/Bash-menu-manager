@@ -29,7 +29,10 @@ yel='\e[1;33m'
 # main menu UI
 print_help(){
 echo -e "${blu}*****************************************${wht}"
-echo "       SYSTEM MANAGER (v1.0.69)          "
+echo "       
+┏┓┓┏┏┓┏┳┓┏┓┳┳┓  ┳┳┓┏┓┳┓┏┓┏┓┏┓┳┓  ┏  ┓ ┏┓ ┏┓┏┓┓
+┗┓┗┫┗┓ ┃ ┣ ┃┃┃  ┃┃┃┣┫┃┃┣┫┃┓┣ ┣┫  ┃┓┏┃ ┃┫ ┣┓┗┫┃
+┗┛┗┛┗┛ ┻ ┗┛┛ ┗  ┛ ┗┛┗┛┗┛┗┗┛┗┛┛┗  ┗┗┛┻•┗┛•┗┛┗┛┛"
 echo -e "${blu}-----------------------------------------${wht}"
 echo ""
 echo -e "${grn}NETWORK${wht}"
@@ -156,15 +159,19 @@ case $command in
         ;;
 "group")
 	echo ""
-        echo "CHOOSE A NEW DEFAULT GROUP"
+    echo "CHOOSE A NEW DEFAULT GROUP"
 	awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 	echo ""
 	read -p "New default group: " def_grp_usr
+	if grep -q "^$def_grp_usr:" /etc/group; then
 	usermod -g $def_grp_usr $mod_usr
 	echo "Group has been changed."
+	else
+		echo "ERROR: Group '$def_grp_usr' does not exist!"
+	fi
         ;;
 "userid")
-        echo ""
+    echo ""
 	echo "CHOOSE A NEW USERID"
 	read -p "new_id> " new_id
 	usermod -u $new_id $mod_usr
@@ -181,7 +188,7 @@ case $command in
 	;;
 
 "comment")
-        echo ""
+    echo ""
 	echo "ADD A NEW COMMENT TO USER PROFILE"
 	read -p "comment> " new_comment
 	usermod -c $new_comment $mod_usr
@@ -232,7 +239,7 @@ if grep -q "^$del_usr:" /etc/passwd; then
 	echo ""
 	echo "User '$del_usr' has been deleted!"
 else
-	echo "ERROR: Username '$us'"
+	echo "ERROR: Username '$del_usr' does not exist!"
 fi
 }
 
