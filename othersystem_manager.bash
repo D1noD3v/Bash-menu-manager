@@ -179,7 +179,7 @@ case $command in
 	echo ""
 	echo "'$new_comment' has been added as a comment to $mod_usr"
         ;;
-
+# Change home directory of selected user
 "home")
 	echo ""
 	echo "Change home directory of current user"
@@ -190,7 +190,7 @@ case $command in
 	echo ""
 	echo "Changed home directory of '$mod_usr' to '$new_home'."
 	;;
-
+# Change the shell of the selected user
 "shell")
 	echo ""
 	echo "Changing '$mod_usr's shell..."
@@ -238,6 +238,7 @@ echo "owner, group, permissions, sticky bit or setgid"
 echo ""
 read -p "Command > " command
 case $command in
+# Change owner of a directory/folder/file
 "owner")
 	echo ""
 	read -rp "Enter username of new owner: " user
@@ -248,6 +249,7 @@ case $command in
 	read -rp "Enter new owner group: " grp
 	chgrp -v $grp $folder_name3
 	;;
+# Change Read, write or execute permissions for Owner, group or other on directory/folder/file
 "permissions")
 	echo ""
 	echo "What permissions would you like to change?"
@@ -295,6 +297,7 @@ case $command in
 		echo "ERROR: Invalid selection! Please try again."
 	fi
 	;;
+# Sets sticky bit to specifed file/directory
 "sticky bit")
 	echo "Do you want to (add) or (remove) sticky bit to $folder_name3?"
 	read -p "> " add_rem_stick
