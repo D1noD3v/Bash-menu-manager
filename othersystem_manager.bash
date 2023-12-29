@@ -103,15 +103,20 @@ awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
 read -p "Username (existing user): " usrnm
 echo ""
-echo "Username:" $usrnm
-echo "UserID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $3}')
-echo "GroupID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $4}')
-echo "Comment:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $5}')
-echo "Home Directory:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $6}')
-echo "Shell Directory:" $(grep $usrnm /etc/passwd| awk -F ":" '{print $7}')
-echo ""
-echo "Groups:" $(groups $usrnm | awk -F ":" '{print $2}')
-echo ""
+# Check if user exists in /etc/passwd
+if grep -q "^$usrnm:" /etc/passwd; then
+	echo "Username:" $usrnm
+	echo "UserID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $3}')
+	echo "GroupID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $4}')
+	echo "Comment:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $5}')
+	echo "Home Directory:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $6}')
+	echo "Shell Directory:" $(grep $usrnm /etc/passwd| awk -F ":" '{print $7}')
+	echo ""
+	echo "Groups:" $(groups $usrnm | awk -F ":" '{print $2}')
+	echo ""
+else
+	echo "ERROR: Username '$usrnm' does not exist!"
+fi
 }
 
 # modify specific users props
@@ -123,16 +128,20 @@ awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
 read -p "Username(of user to modify): " mod_usr
 echo ""
-echo "Username:" $mod_usr
-echo ""
-echo "UserID:" $(grep $mod_usr /etc/passwd | awk -F ":" '{print $3}')
-echo "GroupID:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $4}')
-echo "Comment:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $5}')
-echo "Home Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $6}')
-echo "Shell Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $7}')
-echo ""
-echo "Groups:" $(groups $mod_usr | awk -F ":" '{print $2}')
-echo ""
+if grep -q "^$mod_usr:" /etc/passwd; then
+	echo "Username:" $mod_usr
+	echo ""
+	echo "UserID:" $(grep $mod_usr /etc/passwd | awk -F ":" '{print $3}')
+	echo "GroupID:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $4}')
+	echo "Comment:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $5}')
+	echo "Home Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $6}')
+	echo "Shell Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $7}')
+	echo ""
+	echo "Groups:" $(groups $mod_usr | awk -F ":" '{print $2}')
+	echo ""
+else
+	echo "ERROR: Username '$usrnm' does not exist!"
+fi
 echo "What property would you like to modify?"
 echo "username, group, userid, groupid, comment, home, shell"
 echo ""
@@ -217,9 +226,14 @@ echo ""
 awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
 read -p "Username: " del_usr
-deluser --remove-home $del_usr
-echo ""
-echo "User '$del_usr' has been deleted!"
+
+if grep -q "^$del_usr:" /etc/passwd; then
+	deluser --remove-home $del_usr
+	echo ""
+	echo "User '$del_usr' has been deleted!"
+else
+	echo "ERROR: Username '$us'"
+fi
 }
 
 # modify a folders properties
