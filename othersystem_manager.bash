@@ -175,7 +175,7 @@ case $command in
         echo ""
 	echo "ADD A NEW COMMENT TO USER PROFILE"
 	read -p "comment> " new_comment
-	usermod -c '$new_comment' $mod_usr
+	usermod -c $new_comment $mod_usr
 	echo ""
 	echo "'$new_comment' has been added as a comment to $mod_usr"
         ;;
