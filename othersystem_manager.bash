@@ -12,6 +12,7 @@ art="
 ┗┛┗┛┗┛ ┻ ┗┛┛ ┗  ┛ ┗┛┗┛┗┛┗┗┛┗┛┛┗  ┗┗┛┻•┗┛•┗┛┗┛┛
 "
 
+clear
 IFS=$'\n'
 for line in $art; do
     echo "$line"
@@ -28,13 +29,9 @@ yel='\e[1;33m'
 
 # main menu UI
 print_help(){
-echo -e "${blu}*****************************************${wht}"
-echo "       
-┏┓┓┏┏┓┏┳┓┏┓┳┳┓  ┳┳┓┏┓┳┓┏┓┏┓┏┓┳┓  ┏  ┓ ┏┓ ┏┓┏┓┓
-┗┓┗┫┗┓ ┃ ┣ ┃┃┃  ┃┃┃┣┫┃┃┣┫┃┓┣ ┣┫  ┃┓┏┃ ┃┫ ┣┓┗┫┃
-┗┛┗┛┗┛ ┻ ┗┛┛ ┗  ┛ ┗┛┗┛┗┛┗┗┛┗┛┛┗  ┗┗┛┻•┗┛•┗┛┗┛┛
-"
-echo -e "${blu}-----------------------------------------${wht}"
+echo -e "${blu}**************************************${wht}"
+echo "       SYSTEM MANAGER (v1.0.69)          "
+echo -e "${blu}--------------------------------------${wht}"
 echo ""
 echo -e "${grn}NETWORK${wht}"
 echo -e "${red}ni${wht} - Network Information"
@@ -60,35 +57,31 @@ echo -e "${red}fv${wht} - View folder properties"
 echo -e "${red}fm${wht} - Modify folder properties"
 echo -e "${red}fd${wht} - Delete a folder"
 echo ""
-echo -e "${red}ex${wht} - Exit the program"
+echo -e "${yel}ex${wht} - Exit the program"
 }
 
 #logo to add for every function
 sysman_logo(){
-echo -e "${blu}*****************************************${wht}"
-echo "       
-┏┓┓┏┏┓┏┳┓┏┓┳┳┓  ┳┳┓┏┓┳┓┏┓┏┓┏┓┳┓  ┏  ┓ ┏┓ ┏┓┏┓┓
-┗┓┗┫┗┓ ┃ ┣ ┃┃┃  ┃┃┃┣┫┃┃┣┫┃┓┣ ┣┫  ┃┓┏┃ ┃┫ ┣┓┗┫┃
-┗┛┗┛┗┛ ┻ ┗┛┛ ┗  ┛ ┗┛┗┛┗┛┗┗┛┗┛┛┗  ┗┗┛┻•┗┛•┗┛┗┛┛
-"
-echo -e "${blu}-----------------------------------------${wht}"
+echo -e "${blu}**************************************${wht}"
+echo "       SYSTEM MANAGER (v1.0.69)          "
+echo -e "${blu}--------------------------------------${wht}"
 }
 
 #shows network info
 show_net_info(){
 clear
 sysman_logo
-echo "Network Information"
+echo -e "	 ${yel}NETWORK INFORMATION${wht}"
 echo ""
-echo -e "${red}Computer name:${wht}" $(uname -n)
+echo -e "${red}Computer name:${wht}" $(hostname)
 echo ""
 for interfaces in $(ip -br addr show | grep -v 'lo' | awk '{print $1}'); do
-        echo -e "${grn}Interface:${wht}" $interfaces
-        ip addr show $interfaces | awk '{print "\033[32m" "IP Address:", "\033[37m" $2}' | awk 'NR==3' | cut -d "/" -f 1
-        ip r | grep default | grep $interfaces | awk '{print "\033[32m" "Gateway:", "\033[37m" $3}'
-        ip addr show $interfaces | grep link/ | awk '{print "\033[32m" "MAC:", "\033[37m" $2}'
-        echo -e "${grn}Status:${wht}" $(ip link show | awk 'NR==3' | awk '{print $9}')
-        echo ""
+    echo -e "${grn}Interface:${wht}" $interfaces
+    ip addr show $interfaces | awk '{print "\033[32m" "IP Address:", "\033[37m" $2}' | awk 'NR==3' | cut -d "/" -f 1
+    ip r | grep default | grep $interfaces | awk '{print "\033[32m" "Gateway:", "\033[37m" $3}'
+    ip addr show $interfaces | grep link/ | awk '{print "\033[32m" "MAC:", "\033[37m" $2}'
+    echo -e "${grn}Status:${wht}" $(ip link show | awk 'NR==3' | awk '{print $9}')
+    echo ""
 done
 }
 
@@ -97,93 +90,77 @@ add_user(){
 sysman_logo
 echo "Creating a user..."
 echo ""
-read -p "Username: " username
+read -p "Enter username: " username
 sudo adduser --quiet "$username"
-echo '-------------------------'
+echo '--------------------------------------'
+echo "User: $username has been created!"
 }
 
 # view properties of a certain user
 user_props(){
 sysman_logo
-echo "USER PROPERTIES"
+echo -e "	   ${yel}USER PROPERTIES${wht}"
 echo ""
+echo "Users:"
 awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
-read -p "Username (existing user): " usrnm
+read -p "Username: " usrnm
+echo "UserID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $3}')
+echo "GroupID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $4}')
+echo "Comment:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $5}')
+echo "Home Directory:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $6}')
+echo "Shell Directory:" $(grep $usrnm /etc/passwd| awk -F ":" '{print $7}')
+echo "Groups:"$(groups $usrnm | awk -F ":" '{print $2}')
 echo ""
-# Check if user exists in /etc/passwd
-if grep -q "^$usrnm:" /etc/passwd; then
-	echo "Username:" $usrnm
-	echo "UserID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $3}')
-	echo "GroupID:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $4}')
-	echo "Comment:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $5}')
-	echo "Home Directory:" $(grep $usrnm /etc/passwd | awk -F ":" '{print $6}')
-	echo "Shell Directory:" $(grep $usrnm /etc/passwd| awk -F ":" '{print $7}')
-	echo ""
-	echo "Groups:" $(groups $usrnm | awk -F ":" '{print $2}')
-	echo ""
-else
-	echo "ERROR: Username '$usrnm' does not exist!"
-fi
 }
 
 # modify specific users props
 user_modify(){
 sysman_logo
-echo "MODIFY USERS PROPS"
+echo -e "	${yel}USER PROPERTY MODIFIER${wht}"
 echo ""
+echo "User:"
 awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
-read -p "Username(of user to modify): " mod_usr
+read -p "Username: " mod_usr
+echo "UserID:" $(grep $mod_usr /etc/passwd | awk -F ":" '{print $3}')
+echo "GroupID:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $4}')
+echo "Comment:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $5}')
+echo "Home Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $6}')
+echo "Shell Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $7}')
+echo "Groups:"$(groups $mod_usr | awk -F ":" '{print $2}')
 echo ""
-if grep -q "^$mod_usr:" /etc/passwd; then
-	echo "Username:" $mod_usr
-	echo ""
-	echo "UserID:" $(grep $mod_usr /etc/passwd | awk -F ":" '{print $3}')
-	echo "GroupID:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $4}')
-	echo "Comment:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $5}')
-	echo "Home Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $6}')
-	echo "Shell Directory:" $(grep $mod_usr /etc/passwd| awk -F ":" '{print $7}')
-	echo ""
-	echo "Groups:" $(groups $mod_usr | awk -F ":" '{print $2}')
-	echo ""
-else
-	echo "ERROR: Username '$usrnm' does not exist!"
-fi
 echo "What property would you like to modify?"
-echo "username, group, userid, groupid, comment, home, shell"
+echo ""
+echo -e "${yel}USERNAME${wht} | ${yel}GROUP${wht} | ${yel}USERID${wht} | ${yel}GROUPID${wht} | ${yel}COMMENT${wht} | ${yel}HOME${wht} | ${yel}SHELL${wht}"
 echo ""
 read -p "> " command
 case $command in
-"username")
+"username" | "USERNAME")
         echo ""
         read -p "New username: " new_usr
 	usermod -l $new_usr $mod_usr
 	echo "$mod_usr has been changed to $new_usr"´
 	echo ""
         ;;
-"group")
+"group" | "GROUP")
 	echo ""
-    echo "CHOOSE A NEW DEFAULT GROUP"
+        echo "CHOOSE A NEW DEFAULT GROUP"
 	awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 	echo ""
 	read -p "New default group: " def_grp_usr
-	if grep -q "^$def_grp_usr:" /etc/group; then
 	usermod -g $def_grp_usr $mod_usr
 	echo "Group has been changed."
-	else
-		echo "ERROR: Group '$def_grp_usr' does not exist!"
-	fi
         ;;
-"userid")
-    echo ""
+"userid" | "USERID")
+        echo ""
 	echo "CHOOSE A NEW USERID"
 	read -p "new_id> " new_id
 	usermod -u $new_id $mod_usr
 	echo ""
 	echo "$mod_usr 's id has been changed to $new_id."
         ;;
-"groupid")
+"groupid" | "GROUPID")
 	echo ""
 	echo "CHOOSE A NEW GROUPID(HAS TO BE AN ID OF AN EXISTING GROUP!)"
 	read -p "gid> " new_gid
@@ -192,16 +169,16 @@ case $command in
 	echo "'$mod_usr' groupid has been changed to $new_gid"
 	;;
 
-"comment")
-    echo ""
+"comment" | "COMMENT")
+        echo ""
 	echo "ADD A NEW COMMENT TO USER PROFILE"
 	read -p "comment> " new_comment
-	usermod -c $new_comment $mod_usr
+	usermod -c '$new_comment' $mod_usr
 	echo ""
 	echo "'$new_comment' has been added as a comment to $mod_usr"
         ;;
-# Change home directory of selected user
-"home")
+
+"home" | "HOME")
 	echo ""
 	echo "Change home directory of current user"
 	echo ""
@@ -211,8 +188,8 @@ case $command in
 	echo ""
 	echo "Changed home directory of '$mod_usr' to '$new_home'."
 	;;
-# Change the shell of the selected user
-"shell")
+
+"shell" | "SHELL")
 	echo ""
 	echo "Changing '$mod_usr's shell..."
 	echo ""
@@ -223,9 +200,9 @@ case $command in
 	;;
 
 *)
-        echo "ERROR... [Invalid Selection: $selection]";
-        read -p "Press enter to continue..."
-        ;;
+    echo "ERROR... [Invalid Selection: $selection]";
+    read -p "Press enter to continue..."
+    ;;
 esac
 
 }
@@ -233,25 +210,22 @@ esac
 # delete a user
 delete_usr(){
 sysman_logo
-echo "Which user do you wanna delete?"
+echo -e "	   ${yel}USER REMOVER${wht}"
 echo ""
+echo "Users:"
 awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo ""
-read -p "Username: " del_usr
-
-if grep -q "^$del_usr:" /etc/passwd; then
-	deluser --remove-home $del_usr
-	echo ""
-	echo "User '$del_usr' has been deleted!"
-else
-	echo "ERROR: Username '$del_usr' does not exist!"
-fi
+read -p "Select user: " del_usr
+deluser --remove-home $del_usr
+echo ""
 }
 
 # modify a folders properties
 folder_modify(){
 clear
 sysman_logo
+echo -e "	   ${yel}FOLDER MODIFIER${wht}"
+echo ""
 read -p "Enter folder name: " folder_name3
 if [ ! -d "$folder_name3" ]; then
 	echo "$folder_name3 could not be found."
@@ -264,7 +238,6 @@ echo "owner, group, permissions, sticky bit or setgid"
 echo ""
 read -p "Command > " command
 case $command in
-# Change owner of a directory/folder/file
 "owner")
 	echo ""
 	read -rp "Enter username of new owner: " user
@@ -275,7 +248,6 @@ case $command in
 	read -rp "Enter new owner group: " grp
 	chgrp -v $grp $folder_name3
 	;;
-# Change Read, write or execute permissions for Owner, group or other on directory/folder/file
 "permissions")
 	echo ""
 	echo "What permissions would you like to change?"
@@ -323,7 +295,6 @@ case $command in
 		echo "ERROR: Invalid selection! Please try again."
 	fi
 	;;
-# Sets sticky bit to specifed file/directory
 "sticky bit")
 	echo "Do you want to (add) or (remove) sticky bit to $folder_name3?"
 	read -p "> " add_rem_stick
@@ -383,6 +354,8 @@ esac
 
 folder_view(){
 	sysman_logo
+	echo -e "	   ${yel}FOLDER VIEWER${wht}"
+	echo ""
 	read -p "Enter the directory: " dir_name
 	echo ""
 	ls -a --color=auto $dir_name
@@ -402,18 +375,21 @@ folder_view(){
 # user
 create_grp(){
 sysman_logo
+echo -e "	   ${yel}GROUP CREATOR${wht}"
+echo ""
 echo "Creating user group..."
 echo ""
 read -p "Enter group name: " grp_name
-groupadd $grp_name
 echo ""
-echo "Group '$grp_name' has been created."
+addgroup $grp_name
 echo ""
 }
 
 group_modify(){
 clear
 sysman_logo
+echo -e "	   ${yel}GROUP MODIFIER${wht}"
+echo ""
 echo "Available Users:"
 awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 echo -e "\nSelect a user: "
@@ -451,33 +427,33 @@ fi
 
 clear
 while true; do
-        clear
-        print_help
+    clear
+    print_help
 	echo ""
-        read -rp "Selection > " selection;
-        case $selection in
-        "ni")
+    read -rp "Selection > " selection;
+    case $selection in
+    "ni")
 		clear
-                show_net_info
-                read -p "Press enter to continue..."
-                ;;
-        "ex")
+        show_net_info
+        read -p "Press enter to continue..."
+        ;;
+    "ex")
 		clear
-                echo "Quitting...";
-                exit 0
-                ;;
+        echo "Quitting...";
+        exit 0
+        ;;
 	"ua")
 		clear
 		add_user
-		echo "User has been created"
 		echo ""
 		read -p "Press enter to continue..."
 		;;
 	"ul")
 		clear
 		sysman_logo
-		echo "LOGIN USERS"
+		echo -e "	  ${yel}USERS WITH LOGIN${wht}"
 		echo ""
+		echo "Users:"
 		awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 		echo ""
 		read -p "Press enter to continue..."
@@ -505,8 +481,9 @@ while true; do
 	"gl")
 		clear
 		sysman_logo
-		echo "Listing all groups"
+		echo -e "	   ${yel}GROUP LIST${wht}"
 		echo ""
+		echo "All groups:"
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
 		read -p "Press enter to continue..."
@@ -514,6 +491,8 @@ while true; do
 	"gv")
 		clear
 		sysman_logo
+		echo -e "	  ${yel}GROUP USER VIEWER${wht}"
+		echo ""
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo -e "\nSelect a group: "
 		read -p "> " grp_select
@@ -530,9 +509,11 @@ while true; do
 	"gd")
 		clear
 		sysman_logo
+		echo -e "	   ${yel}GROUP REMOVER${wht}"
+		echo ""
 		echo "Available groups:"
-                awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
-                echo -e "\nSelect a group: "
+        awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
+        echo -e "\nSelect a group: "
 		read -p "> " grp_del
 		echo ""
 		groupdel $grp_del
@@ -547,25 +528,35 @@ while true; do
 	"fa")
 		clear
 		sysman_logo
+		echo -e "	   ${yel}FOLDER CREATOR${wht}"
+		echo ""
 		echo "Creating a folder..."
-		read -p "Folder name: " folder_name
 		read -p "Folder location: " folder_location
+		ls -l $folder_location
+		read -p "Folder name: " folder_name
 		echo ""
 		echo "Available users:"
-		awk -F: '$3 >= 1000 || $3 == 0 && $1 != "nobody" {print $1}' /etc/passwd
+		awk -F: '$3 >= 1000 && $1 != "nobody" || $3 == 0 {print $1}' /etc/passwd
 		echo ""
 		read -p "Select folder owner: " folder_owner
-
-		#behöver fixa så att det blir mer robust
-
 		echo ""
 		sudo -u "$folder_owner" mkdir -v $folder_location/$folder_name
+		echo ""
+		if [[ ! -d "$folder_location/$folder_name" ]]; then
+			echo "$folder_name was unable to be created."
+		else
+			echo "$folder_name was successfully created!"
+		fi
+		echo ""	
+		ls -l $folder_location
 		echo ""
 		read -p "Press enter to continue..."
 		;;
 	"fl")
 		clear
 		sysman_logo
+		echo -e "	   ${yel}FOLDER VIEWER${wht}"
+		echo ""
 		read -p "Enter folder name: " folder_name2
 		echo "FOLDER CONTENT"
 		echo ""
@@ -587,6 +578,8 @@ while true; do
 	"fd")
 		clear
 		sysman_logo
+		echo -e "	   ${yel}FOLDER REMOVER${wht}"
+		echo ""
 		read -p "Enter folder name: " folder_name4
 		echo "Are you sure you want to delete $folder_name4? (y/n)"
 		read -p "> " fd_check
