@@ -20,7 +20,7 @@ for line in $art; do
     echo "$line"
     sleep 0.2
 done
-read -p "Press any key to continue..."
+read -rp "Press any key to continue..."
 
 # Define ANSI color codes
 grn='\e[0;32m'
@@ -95,7 +95,7 @@ add_user(){
 	echo ""
 	echo "Creating a user..."
 	echo ""
-	read -p "Enter username: " username
+	read -rp "Enter username: " username
 	if adduser --quiet "$username"; then
 		echo '--------------------------------------'
 		echo "User: '$username' has been created!"
@@ -113,7 +113,7 @@ user_props(){
 	# Prints all users with UID over 1000 that aren't called nobody from /etc/passwd to filter for only user accounts
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo ""
-	read -p "Username: " usrnm
+	read -rp "Username: " usrnm
 	echo "UserID:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $3}')
 	echo "GroupID:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $4}')
 	echo "Comment:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $5}')
@@ -131,7 +131,7 @@ user_modify(){
 	echo "User:"
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo ""
-	read -p "Username: " mod_usr
+	read -rp "Username: " mod_usr
 	# If it can't find the exact username, exit the function
 	if grep -q "^$mod_usr:" /etc/passwd; then
 		true
@@ -152,11 +152,11 @@ user_modify(){
 	echo ""
 	echo -e "${yel}USERNAME${wht} | ${yel}GROUP${wht} | ${yel}USERID${wht} | ${yel}GROUPID${wht} | ${yel}COMMENT${wht} | ${yel}HOME${wht} | ${yel}SHELL${wht}"
 	echo ""
-	read -p "> " command
+	read -rp "> " command
 	case $command in
 	"username" | "USERNAME")
 		echo ""
-		read -p "New username: " new_usr
+		read -rp "New username: " new_usr
 		# If command ran without problem
 		if usermod -l $new_usr $mod_usr; then
 			echo ""
@@ -171,7 +171,7 @@ user_modify(){
 		echo "CHOOSE A NEW DEFAULT GROUP"
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
-		read -p "New default group: " def_grp_usr
+		read -rp "New default group: " def_grp_usr
 		if usermod -g $def_grp_usr $mod_usr; then
 			echo ""
 			echo "Group has been changed."
@@ -185,7 +185,7 @@ user_modify(){
 		echo "CHOOSE A NEW USERID"
 		awk -F: '$3 >= 1000 && $1 != "nobody" {print $1":",$3}' /etc/passwd
 		echo ""
-		read -p "> " new_id
+		read -rp "> " new_id
 		echo ""
 		if usermod -u $new_id $mod_usr; then
 			echo "UID of '$mod_usr' has been changed to '$new_id'."
@@ -201,7 +201,7 @@ user_modify(){
 		# Prints all groups with GID over 1000 that aren't called nogroup from /etc/group to filter for only user groups
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1":",$3}' /etc/group
 		echo ""
-		read -p "> " new_gid
+		read -rp "> " new_gid
 		echo ""
 		if usermod -g $new_gid $mod_usr; then
 			echo "'$mod_usr' groupid has been changed to '$new_gid'."
@@ -215,7 +215,7 @@ user_modify(){
 		echo ""
 		echo "ADD A NEW COMMENT TO '$mod_usr'"
 		echo ""
-		read -p "> " new_comment
+		read -rp "> " new_comment
 		echo ""
 		if usermod -c $new_comment $mod_usr; then
 			echo "'$new_comment' has been added as a comment to '$mod_usr'."
@@ -229,7 +229,7 @@ user_modify(){
 		echo ""
 		echo "CHOOSE A NEW HOME DIRECTORY"
 		echo ""
-		read -p "> /home/" new_home
+		read -rp "> /home/" new_home
 		echo ""
 		if usermod -d "/home/$new_home" $mod_usr; then
 			echo "Changed home directory of '$mod_usr' to '/home/$new_home'."
@@ -243,7 +243,7 @@ user_modify(){
 		echo ""
 		echo "ENTER THE NEW SHELL"
 		echo ""
-		read -p "> /bin/" new_shell
+		read -rp "> /bin/" new_shell
 		echo ""
 		if usermod -s "/bin/$new_shell" $mod_usr; then
 			echo "Changed '$mod_usr' shell from '$SHELL' to '/bin/$new_shell'."
@@ -256,7 +256,7 @@ user_modify(){
 	*)
 		echo "ERROR... [Invalid Selection: $selection]";
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 	esac
 
@@ -270,7 +270,7 @@ delete_usr(){
 	echo "Users:"
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo ""
-	read -p "Select user: " del_usr
+	read -rp "Select user: " del_usr
 	deluser --remove-home $del_usr
 	echo ""
 }
@@ -281,7 +281,7 @@ folder_modify(){
 	sysman_logo
 	echo -e "	   ${yel}FOLDER MODIFIER${wht}"
 	echo ""
-	read -p "Enter folder absolute PATH: " folder_name3
+	read -rp "Enter folder absolute PATH: " folder_name3
 	echo ""
 	# Exit the function if the folder specifed does not exist
 	if [ ! -d "$folder_name3" ]; then
@@ -291,14 +291,14 @@ folder_modify(){
 	echo "What property would you like change?"
 	echo -e "${yel}OWNER${wht} | ${yel}GROUP${wht} | ${yel}PERMISSIONS${wht} | ${yel}STICKY BIT${wht} | ${yel}SETGID${wht}"
 	echo ""
-	read -p "> " command
+	read -rp "> " command
 	case $command in
 	"owner"|"OWNER")
 		echo ""
 		echo "Available Users:"
 		awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 		echo ""
-		read -p "Select new owner: " user
+		read -rp "Select new owner: " user
 		echo ""
 		chown -v $user $folder_name3
 		;;
@@ -307,7 +307,7 @@ folder_modify(){
 		echo "Available Groups:"
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
-		read -p "Select new owner group: " grp
+		read -rp "Select new owner group: " grp
 		echo ""
 		chgrp -v $grp $folder_name3
 		;;
@@ -317,7 +317,7 @@ folder_modify(){
 		echo -e "${yel}(R)EAD${wht} | ${yel}(W)RITE${wht} | ${yel}E(X)ECUTE${wht} | ${yel}(A)LL${wht}"
 		echo ""
 		# Listens for only 1 character
-		read -p "> " -n 1 perm_select
+		read -rp "> " -n 1 perm_select
 		# Converts user's string to lowercase for simpler if-statements
 		perm_select="${perm_select,,}"
 		echo ""
@@ -327,7 +327,7 @@ folder_modify(){
 			echo "Who's permissions do you want to change?"
 			echo -e "${yel}OWNER${wht} | ${yel}GROUP${wht} | ${yel}OTHER${wht} | ${yel}ALL${wht}"
 			echo ""
-			read -p "> " perm_ogo
+			read -rp "> " perm_ogo
 			perm_ogo="${perm_ogo,,}"
 			echo ""
 			if [[ $perm_ogo == "owner" ]]; then
@@ -363,13 +363,13 @@ folder_modify(){
 			echo "Who's permissions do you want to change?"
 			echo -e "${yel}(U)SER OWNER${wht} | ${yel}(G)ROUP${wht} | ${yel}(O)THER${wht} | ${yel}(A)LL${wht}"
 			echo ""
-			read -p "> " -n 1 perm_ogo
+			read -rp "> " -n 1 perm_ogo
 			echo ""
 			perm_ogo="${perm_ogo,,}"
 			echo ""
 			echo "Do you want to (add) or (remove) this permission?"
 			echo ""
-			read -p "> " perm_add_or_rem
+			read -rp "> " perm_add_or_rem
 			perm_add_or_rem="${perm_add_or_rem,,}"
 			echo ""
 			if [[ $perm_add_or_rem == "add" ]]; then
@@ -396,13 +396,13 @@ folder_modify(){
 		echo ""
 		echo "Do you want to (add) or (remove) sticky bit for '$folder_name3'?"
 		echo ""
-		read -p "> " add_rem_stick
+		read -rp "> " add_rem_stick
 		if [[ $add_rem_stick == "add" ]]; then
 			echo ""
 			# Confirmation
 			echo "Are you sure? (y/n)"
 			echo ""
-			read -p "> " stick_sel_a
+			read -rp "> " stick_sel_a
 			echo ""
 			if [[ "$stick_sel_a" == "y" ]]; then
 				if chmod +t $folder_name3; then
@@ -419,7 +419,7 @@ folder_modify(){
 			echo ""
 			# Confirmations
 			echo "Are you sure? (y/n)"
-			read -p "> " stick_sel_r
+			read -rp "> " stick_sel_r
 					if [[ "$stick_sel_r" == "y" ]]; then
 							if chmod -t $folder_name3; then
 								echo "Sticky bit was removed from '$folder_name3'."
@@ -437,12 +437,12 @@ folder_modify(){
 		echo ""
 		echo "Do you want to (add) or (remove) SGID for '$folder_name3'?"
 		echo ""
-		read -p "> " add_rem_sgid
+		read -rp "> " add_rem_sgid
 		echo ""
 		if [[ $add_rem_sgid == "add" ]]; then
 			echo "Are you sure? (y/n)"
 			echo ""
-			read -p "> " sgid_sel_a
+			read -rp "> " sgid_sel_a
 			echo ""
 			if [[ "$sgid_sel_a" == "y" ]]; then
 				if chmod g+s $folder_name3; then
@@ -458,7 +458,7 @@ folder_modify(){
 		elif [[ $add_rem_sgid == "remove" ]]; then
 			echo "Are you sure? (y/n)"
 			echo ""
-			read -p "> " sgid_sel_r
+			read -rp "> " sgid_sel_r
 			echo ""
 			if [[ "$sgid_sel_r" == "y" ]]; then
 				if chmod g-s $folder_name3; then
@@ -481,7 +481,7 @@ folder_view(){
 	sysman_logo
 	echo -e "	   ${yel}FOLDER VIEWER${wht}"
 	echo ""
-	read -p "Enter the folder's absolute PATH: " dir_name
+	read -rp "Enter the folder's absolute PATH: " dir_name
 	echo ""
 	echo "PATH: $dir_name"
 	# Uses stat -c to get custom formatting and % to specify the information format sequence
@@ -500,7 +500,7 @@ create_grp(){
 	echo ""
 	echo "Creating user group..."
 	echo ""
-	read -p "Enter group name: " grp_name
+	read -rp "Enter group name: " grp_name
 	echo ""
 	addgroup $grp_name
 	echo ""
@@ -515,7 +515,7 @@ group_modify(){
 	echo "Available Users:"
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo -e "\nSelect a user: "
-	read -p "> " usr_grp_mod
+	read -rp "> " usr_grp_mod
 	clear
 	sysman_logo
 	echo -e "User selected: '$usr_grp_mod'"
@@ -524,38 +524,38 @@ group_modify(){
 	awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 	echo ""
 	echo -e "Select a group: "
-	read -p "> " grp_mod
+	read -rp "> " grp_mod
 	clear
 	sysman_logo
 	echo -e "User selected: '$usr_grp_mod'"
 	echo -e "Group selected: '$grp_mod'"
 	echo ""
 	echo -e "Do you want to (add) or (remove) '$usr_grp_mod' from '$grp_mod'?"
-	read -p "> " add_or_remove
+	read -rp "> " add_or_remove
 	echo ""
 	if [[ "$add_or_remove" == "add" ]]; then
 		if usermod -aG $grp_mod $usr_grp_mod; then
 			echo "User '$usr_grp_mod' has been added to '$grp_mod'!"
 			echo ""
-			read -p "Press enter to continue..."
+			read -rp "Press enter to continue..."
 		else
 			true
 			echo ""
-			read -p "Press enter to continue..."
+			read -rp "Press enter to continue..."
 		fi
 	elif [[ "$add_or_remove" == "remove" ]]; then
 		if gpasswd -d $usr_grp_mod $grp_mod; then
 			echo "User '$usr_grp_mod' has been removed from '$grp_mod'!"
 			echo ""
-			read -p "Press enter to continue..."
+			read -rp "Press enter to continue..."
 		else
 			true
 			echo ""
-			read -p "Press enter to continue..."
+			read -rp "Press enter to continue..."
 		fi
 	else
 		echo "Invalid selection... Try again!"
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 	fi
 }
 
@@ -573,7 +573,7 @@ while true; do
     "ni")
 		clear
         show_net_info
-        read -p "Press enter to continue..."
+        read -rp "Press enter to continue..."
         ;;
 
 	# Exit program
@@ -588,7 +588,7 @@ while true; do
 		clear
 		add_user
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# Lists all users, not including system users
@@ -600,35 +600,35 @@ while true; do
 		echo "Users:"
 		awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# View user properties
 	"uv")
 		clear
 		user_props
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 		
 	# Delete user
 	"ud")
 		clear
 		delete_usr
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 		
 	# Modify user properties
 	"um")
 		clear
 		user_modify
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 		
 	# Create group
 	"ga")
 		clear
 		create_grp
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 		
 	# Lists all user groups
@@ -640,7 +640,7 @@ while true; do
 		echo "All Groups:"
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# View specifed group
@@ -653,7 +653,7 @@ while true; do
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
 		echo "Select a group: "
-		read -p "> " grp_select
+		read -rp "> " grp_select
 		echo ""
 		# Saves the GID for later use
 		GID=$(grep "^$grp_select:" /etc/group | cut -d ":" -f 3)
@@ -661,7 +661,7 @@ while true; do
 		echo -e "Primary Group User:" $(grep ":$GID:" /etc/passwd | cut -d ":" -f 1)
 		echo -e "Other Group Members:" $(grep ":$GID:" /etc/group | cut -d ":" -f 4-)
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 	
 	# Add/Remove user from group
@@ -678,7 +678,7 @@ while true; do
 		echo "Available groups:"
         awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
         echo -e "\nSelect a group: "
-		read -p "> " grp_del
+		read -rp "> " grp_del
 		echo ""
 		groupdel $grp_del
 		if grep -q "^$grp_del:" /etc/group; then
@@ -687,7 +687,7 @@ while true; do
 			echo -e "Group: '$grp_del' has been removed!"
 		fi
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 	
 	# Create folder
@@ -698,13 +698,13 @@ while true; do
 		echo ""
 		echo "Creating a folder..."
 		echo ""
-		read -p "Desired Location: " folder_location
-		read -p "Folder Name: " folder_name
+		read -rp "Desired Location: " folder_location
+		read -rp "Folder Name: " folder_name
 		echo ""
 		echo "Available users:"
 		awk -F: '$3 >= 1000 && $1 != "nobody" || $3 == 0 {print $1}' /etc/passwd
 		echo ""
-		read -p "Select folder owner: " folder_owner
+		read -rp "Select folder owner: " folder_owner
 		echo ""
 		if sudo -u "$folder_owner" mkdir $folder_location/$folder_name; then
 			echo "'$folder_name' was successfully created!"
@@ -712,7 +712,7 @@ while true; do
 			true
 		fi
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# View content of folder
@@ -721,13 +721,13 @@ while true; do
 		sysman_logo
 		echo -e "	   ${yel}FOLDER VIEWER${wht}"
 		echo ""
-		read -p "Enter folder absolute PATH: " folder_name2
+		read -rp "Enter folder absolute PATH: " folder_name2
 		echo ""
 		echo "FOLDER CONTENT"
 		echo ""
 		ls -a --color=auto $folder_name2
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# View folder properties
@@ -735,14 +735,14 @@ while true; do
 		clear
 		folder_view
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# Modify folder properties
 	"fm")
 		folder_modify
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 		
 	# Delete folder
@@ -751,12 +751,12 @@ while true; do
 		sysman_logo
 		echo -e "	   ${yel}FOLDER REMOVER${wht}"
 		echo ""
-		read -p "Enter folder absolute PATH: " folder_name4
+		read -rp "Enter folder absolute PATH: " folder_name4
 		if [ ! -d "$folder_name4" ]; then
 			echo ""
 			echo "Folder does not exist..."
 			echo ""
-			read -p "Press enter to continue..."
+			read -rp "Press enter to continue..."
 			continue
 		else
 			true
@@ -764,7 +764,7 @@ while true; do
 		echo ""
 		echo "Are you sure you want to delete '$folder_name4'? (y/n)"
 		echo ""
-		read -p "> " fd_check
+		read -rp "> " fd_check
 		echo ""
 		if [[ $fd_check == "y" ]]; then
 			rmdir $folder_name4
@@ -772,7 +772,7 @@ while true; do
 				echo "'$folder_name4' was successfully deleted!"
 			else
 				echo "'$folder_name4' was not deleted, would you like to try and force the deletion? (y/n)"
-				read -p "> " force_chk
+				read -rp "> " force_chk
 				if [[ $force_chk == "y" ]]; then
 					rm -rf $folder_name4
 					if [ ! -d "$folder_name4" ]; then
@@ -792,14 +792,14 @@ while true; do
 			echo "ERROR: Invalid selection! Please try again."
 		fi
 		echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
 		;;
 
 	# If the selection is invalid
 	*)
         echo "ERROR... [Invalid Selection: '$selection']"
         echo ""
-		read -p "Press enter to continue..."
+		read -rp "Press enter to continue..."
         ;;		
 esac
 done
