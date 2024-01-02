@@ -75,15 +75,15 @@ show_net_info(){
 	sysman_logo
 	echo -e "	 ${yel}NETWORK INFORMATION${wht}"
 	echo ""
-	echo -e "${red}Computer name:${wht}" $(hostname)
+	echo -e "${red}Computer name:${wht}" "$(hostname)"
 	echo ""
 	# Loops through all interfaces and prints out name, ip, mac, gateway and status with a color
 	for interfaces in $(ip -br addr show | grep -v 'lo' | awk '{print $1}'); do
-		echo -e "${grn}Interface:${wht}" $interfaces
-		ip addr show $interfaces | awk '{print "\033[32m" "IP Address:", "\033[37m" $2}' | awk 'NR==3' | cut -d "/" -f 1
-		ip r | grep default | grep $interfaces | awk '{print "\033[32m" "Gateway:", "\033[37m" $3}'
-		ip addr show $interfaces | grep link/ | awk '{print "\033[32m" "MAC:", "\033[37m" $2}'
-		echo -e "${grn}Status:${wht}" $(ip link show | awk 'NR==3' | awk '{print $9}')
+		echo -e "${grn}Interface:${wht}" "$interfaces"
+		ip addr show "$interfaces" | awk '{print "\033[32m" "IP Address:", "\033[37m" $2}' | awk 'NR==3' | cut -d "/" -f 1
+		ip r | grep default | grep "$interfaces" | awk '{print "\033[32m" "Gateway:", "\033[37m" $3}'
+		ip addr show "$interfaces" | grep link/ | awk '{print "\033[32m" "MAC:", "\033[37m" $2}'
+		echo -e "${grn}Status:${wht}" "$(ip link show | awk 'NR==3' | awk '{print $9}')"
 		echo ""
 	done
 }
@@ -114,12 +114,12 @@ user_props(){
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo ""
 	read -rp "Username: " usrnm
-	echo "UserID:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $3}')
-	echo "GroupID:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $4}')
-	echo "Comment:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $5}')
-	echo "Home Directory:" $(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $6}')
-	echo "Shell Directory:" $(grep -w "^$usrnm" /etc/passwd| awk -F ":" '{print $7}')
-	echo "Groups:"$(groups $usrnm | awk -F ":" '{print $2}')
+	echo "UserID:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $3}')"
+	echo "GroupID:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $4}')"
+	echo "Comment:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $5}')"
+	echo "Home Directory:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $6}')"
+	echo "Shell Directory:" "$(grep -w "^$usrnm" /etc/passwd| awk -F ":" '{print $7}')"
+	echo "Groups:" "$(groups "$usrnm" | awk -F ":" '{print $2}')"
 	echo ""
 }
 
@@ -141,12 +141,12 @@ user_modify(){
 		echo ""
 		return
 	fi
-	echo "UserID:" $(grep -w "^$mod_usr" /etc/passwd | awk -F ":" '{print $3}')
-	echo "GroupID:" $(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $4}')
-	echo "Comment:" $(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $5}')
-	echo "Home Directory:" $(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $6}')
-	echo "Shell Directory:" $(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $7}')
-	echo "Groups:"$(groups $mod_usr | awk -F ":" '{print $2}')
+	echo "UserID:" "$(grep -w "^$mod_usr" /etc/passwd | awk -F ":" '{print $3}')"
+	echo "GroupID:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $4}')"
+	echo "Comment:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $5}')"
+	echo "Home Directory:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $6}')"
+	echo "Shell Directory:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $7}')"
+	echo "Groups:" "$(groups "$mod_usr" | awk -F ":" '{print $2}')"
 	echo ""
 	echo "What property would you like to modify?"
 	echo ""
@@ -158,7 +158,7 @@ user_modify(){
 		echo ""
 		read -rp "New username: " new_usr
 		# If command ran without problem
-		if usermod -l $new_usr $mod_usr; then
+		if usermod -l "$new_usr" "$mod_usr"; then
 			echo ""
 			echo "Username was successfully changed!"
 		else
@@ -172,7 +172,7 @@ user_modify(){
 		awk -F: '$3 >= 1000 && $1 != "nogroup" {print $1}' /etc/group
 		echo ""
 		read -rp "New default group: " def_grp_usr
-		if usermod -g $def_grp_usr $mod_usr; then
+		if usermod -g "$def_grp_usr" "$mod_usr"; then
 			echo ""
 			echo "Group has been changed."
 		else
@@ -187,7 +187,7 @@ user_modify(){
 		echo ""
 		read -rp "> " new_id
 		echo ""
-		if usermod -u $new_id $mod_usr; then
+		if usermod -u "$new_id" "$mod_usr"; then
 			echo "UID of '$mod_usr' has been changed to '$new_id'."
 			echo ""
 		else
@@ -203,7 +203,7 @@ user_modify(){
 		echo ""
 		read -rp "> " new_gid
 		echo ""
-		if usermod -g $new_gid $mod_usr; then
+		if usermod -g "$new_gid" "$mod_usr"; then
 			echo "'$mod_usr' groupid has been changed to '$new_gid'."
 			echo ""
 		else
@@ -217,7 +217,7 @@ user_modify(){
 		echo ""
 		read -rp "> " new_comment
 		echo ""
-		if usermod -c $new_comment $mod_usr; then
+		if usermod -c "$new_comment" "$mod_usr"; then
 			echo "'$new_comment' has been added as a comment to '$mod_usr'."
 			echo ""
 		else
@@ -231,7 +231,7 @@ user_modify(){
 		echo ""
 		read -rp "> /home/" new_home
 		echo ""
-		if usermod -d "/home/$new_home" $mod_usr; then
+		if usermod -d "/home/$new_home" "$mod_usr"; then
 			echo "Changed home directory of '$mod_usr' to '/home/$new_home'."
 			echo ""
 		else
@@ -245,7 +245,7 @@ user_modify(){
 		echo ""
 		read -rp "> /bin/" new_shell
 		echo ""
-		if usermod -s "/bin/$new_shell" $mod_usr; then
+		if usermod -s "/bin/$new_shell" "$mod_usr"; then
 			echo "Changed '$mod_usr' shell from '$SHELL' to '/bin/$new_shell'."
 			echo ""
 		else
@@ -271,7 +271,7 @@ delete_usr(){
 	awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
 	echo ""
 	read -rp "Select user: " del_usr
-	deluser --remove-home $del_usr
+	deluser --remove-home "$del_usr"
 	echo ""
 }
 
@@ -300,7 +300,7 @@ folder_modify(){
 		echo ""
 		read -rp "Select new owner: " user
 		echo ""
-		chown -v $user $folder_name3
+		chown -v "$user" "$folder_name3"
 		;;
 	"group"|"GROUP")
 		echo ""
@@ -309,7 +309,7 @@ folder_modify(){
 		echo ""
 		read -rp "Select new owner group: " grp
 		echo ""
-		chgrp -v $grp $folder_name3
+		chgrp -v "$grp" "$folder_name3"
 		;;
 	"permissions"|"PERMISSIONS")
 		echo ""
@@ -331,25 +331,25 @@ folder_modify(){
 			perm_ogo="${perm_ogo,,}"
 			echo ""
 			if [[ $perm_ogo == "owner" ]]; then
-				if chmod u+rwx $folder_name3; then
+				if chmod u+rwx "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
 				fi
 			elif [[ $perm_ogo == "group" ]]; then
-				if chmod g+rwx $folder_name3; then
+				if chmod g+rwx "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
 				fi
 			elif [[ $perm_ogo == "other" ]]; then
-				if chmod o+rwx $folder_name3; then
+				if chmod o+rwx "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
 				fi
 			elif [[ $perm_ogo == "all" ]]; then
-				if chmod a+rwx $folder_name3; then
+				if chmod a+rwx "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
@@ -374,22 +374,22 @@ folder_modify(){
 			echo ""
 			if [[ $perm_add_or_rem == "add" ]]; then
 				# Uses user's variables as option for chmod
-				if chmod $perm_ogo+$perm_select $folder_name3; then
+				if chmod "$perm_ogo"+"$perm_select" "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
 				fi
 			elif [[ $perm_add_or_rem == "remove" ]]; then
-				if chmod $perm_ogo-$perm_select $folder_name3; then
+				if chmod "$perm_ogo"-"$perm_select" "$folder_name3"; then
 					echo "Permissions has been changed!"
 				else
 					echo "Something went wrong!"
 				fi
 			else
-				echo "\nERROR: Invalid Selection! Please try again."
+				echo "ERROR: Invalid Selection! Please try again."
 			fi
 		else
-			echo "\nERROR: Invalid selection! Please try again."
+			echo "ERROR: Invalid selection! Please try again."
 		fi
 		;;
 	"sticky bit"|"STICKY BIT")
@@ -405,7 +405,7 @@ folder_modify(){
 			read -rp "> " stick_sel_a
 			echo ""
 			if [[ "$stick_sel_a" == "y" ]]; then
-				if chmod +t $folder_name3; then
+				if chmod +t "$folder_name3"; then
 					echo "Sticky bit was added to '$folder_name3'."
 				else
 					echo "Something went wrong!"
@@ -421,7 +421,7 @@ folder_modify(){
 			echo "Are you sure? (y/n)"
 			read -rp "> " stick_sel_r
 					if [[ "$stick_sel_r" == "y" ]]; then
-							if chmod -t $folder_name3; then
+							if chmod -t "$folder_name3"; then
 								echo "Sticky bit was removed from '$folder_name3'."
 							else
 								echo "Something went wrong!"
@@ -445,7 +445,7 @@ folder_modify(){
 			read -rp "> " sgid_sel_a
 			echo ""
 			if [[ "$sgid_sel_a" == "y" ]]; then
-				if chmod g+s $folder_name3; then
+				if chmod g+s "$folder_name3"; then
 					echo "SGID was added to '$folder_name3'."
 				else
 					echo "Something went wrong!"
@@ -461,7 +461,7 @@ folder_modify(){
 			read -rp "> " sgid_sel_r
 			echo ""
 			if [[ "$sgid_sel_r" == "y" ]]; then
-				if chmod g-s $folder_name3; then
+				if chmod g-s "$folder_name3"; then
 					echo "SGID was removed from '$folder_name3'."
 				else
 					echo "Something went wrong!"
@@ -502,7 +502,7 @@ create_grp(){
 	echo ""
 	read -rp "Enter group name: " grp_name
 	echo ""
-	addgroup $grp_name
+	addgroup "$grp_name"
 	echo ""
 }
 
@@ -534,7 +534,7 @@ group_modify(){
 	read -rp "> " add_or_remove
 	echo ""
 	if [[ "$add_or_remove" == "add" ]]; then
-		if usermod -aG $grp_mod $usr_grp_mod; then
+		if usermod -aG "$grp_mod" "$usr_grp_mod"; then
 			echo "User '$usr_grp_mod' has been added to '$grp_mod'!"
 			echo ""
 			read -rp "Press enter to continue..."
@@ -544,7 +544,7 @@ group_modify(){
 			read -rp "Press enter to continue..."
 		fi
 	elif [[ "$add_or_remove" == "remove" ]]; then
-		if gpasswd -d $usr_grp_mod $grp_mod; then
+		if gpasswd -d "$usr_grp_mod" "$grp_mod"; then
 			echo "User '$usr_grp_mod' has been removed from '$grp_mod'!"
 			echo ""
 			read -rp "Press enter to continue..."
@@ -658,8 +658,8 @@ while true; do
 		# Saves the GID for later use
 		GID=$(grep "^$grp_select:" /etc/group | cut -d ":" -f 3)
 		echo -e "Group ID:" "$GID"
-		echo -e "Primary Group User:" $(grep ":$GID:" /etc/passwd | cut -d ":" -f 1)
-		echo -e "Other Group Members:" $(grep ":$GID:" /etc/group | cut -d ":" -f 4-)
+		echo -e "Primary Group User:" "$(grep ":$GID:" /etc/passwd | cut -d ":" -f 1)"
+		echo -e "Other Group Members:" "$(grep ":$GID:" /etc/group | cut -d ":" -f 4-)"
 		echo ""
 		read -rp "Press enter to continue..."
 		;;
@@ -680,7 +680,7 @@ while true; do
         echo -e "\nSelect a group: "
 		read -rp "> " grp_del
 		echo ""
-		groupdel $grp_del
+		groupdel "$grp_del"
 		if grep -q "^$grp_del:" /etc/group; then
 			echo "Group: '$grp_del' was unable to be deleted!"
 		else
@@ -706,7 +706,7 @@ while true; do
 		echo ""
 		read -rp "Select folder owner: " folder_owner
 		echo ""
-		if sudo -u "$folder_owner" mkdir $folder_location/$folder_name; then
+		if sudo -u "$folder_owner" mkdir "$folder_location"/"$folder_name"; then
 			echo "'$folder_name' was successfully created!"
 		else
 			true
@@ -725,7 +725,7 @@ while true; do
 		echo ""
 		echo "FOLDER CONTENT"
 		echo ""
-		ls -a --color=auto $folder_name2
+		ls -a --color=auto "$folder_name2"
 		echo ""
 		read -rp "Press enter to continue..."
 		;;
@@ -767,14 +767,14 @@ while true; do
 		read -rp "> " fd_check
 		echo ""
 		if [[ $fd_check == "y" ]]; then
-			rmdir $folder_name4
+			rmdir "$folder_name4"
 			if [ ! -d "$folder_name4" ]; then
 				echo "'$folder_name4' was successfully deleted!"
 			else
 				echo "'$folder_name4' was not deleted, would you like to try and force the deletion? (y/n)"
 				read -rp "> " force_chk
 				if [[ $force_chk == "y" ]]; then
-					rm -rf $folder_name4
+					rm -rf "$folder_name4"
 					if [ ! -d "$folder_name4" ]; then
 						echo "'$folder_name4' was successfully deleted!"
 					else
