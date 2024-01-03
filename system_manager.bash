@@ -15,6 +15,13 @@ art="
 
 # IFS is newline, iterates each line from 'art' with small delay on print for dramatic effect
 clear
+
+if [ "$EUID" -ne 0 ]; then
+	echo "Please run the script with sudo!"
+	read -rp "Press any key to exit..."
+	exit
+fi
+
 IFS=$'\n'
 for line in $art; do
     echo "$line"
@@ -119,7 +126,7 @@ user_props(){
 	echo "Comment:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $5}')"
 	echo "Home Directory:" "$(grep -w "^$usrnm" /etc/passwd | awk -F ":" '{print $6}')"
 	echo "Shell Directory:" "$(grep -w "^$usrnm" /etc/passwd| awk -F ":" '{print $7}')"
-	echo "Groups:" "$(groups "$usrnm" | awk -F ":" '{print $2}')"
+	echo "Groups:""$(groups "$usrnm" | awk -F ":" '{print $2}')"
 	echo ""
 }
 
@@ -134,6 +141,7 @@ user_modify(){
 	read -rp "Username: " mod_usr
 	# If it can't find the exact username, exit the function
 	if grep -q "^$mod_usr:" /etc/passwd; then
+		# Continue as usual if it does find username
 		true
 	else
 		echo ""
@@ -146,14 +154,18 @@ user_modify(){
 	echo "Comment:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $5}')"
 	echo "Home Directory:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $6}')"
 	echo "Shell Directory:" "$(grep -w "^$mod_usr" /etc/passwd| awk -F ":" '{print $7}')"
-	echo "Groups:" "$(groups "$mod_usr" | awk -F ":" '{print $2}')"
+	echo "Groups:""$(groups "$mod_usr" | awk -F ":" '{print $2}')"
 	echo ""
 	echo "What property would you like to modify?"
 	echo ""
-	echo -e "${yel}USERNAME${wht} | ${yel}GROUP${wht} | ${yel}USERID${wht} | ${yel}GROUPID${wht} | ${yel}COMMENT${wht} | ${yel}HOME${wht} | ${yel}SHELL${wht}"
+	echo -e "${yel}PASSWORD${wht} | ${yel}USERNAME${wht} | ${yel}GROUP${wht} | ${yel}USERID${wht} | ${yel}GROUPID${wht} | ${yel}COMMENT${wht} | ${yel}HOME${wht} | ${yel}SHELL${wht}"
 	echo ""
 	read -rp "> " command
 	case $command in
+	"password" | "PASSWORD")
+		passwd "$mod_usr"
+		echo ""
+		;;
 	"username" | "USERNAME")
 		echo ""
 		read -rp "New username: " new_usr
@@ -476,22 +488,70 @@ folder_modify(){
 	esac
 }
 
-# View a folder and its contents
+# View a folder with its contents and explain permissions
 folder_view(){
+	clear
 	sysman_logo
 	echo -e "	   ${yel}FOLDER VIEWER${wht}"
 	echo ""
 	read -rp "Enter the folder's absolute PATH: " dir_name
 	echo ""
+	if [ ! -d "$dir_name" ]; then
+		echo "Folder could not be found! Please try again."
+		return
+	else
+		true
+	fi
 	echo "PATH: $dir_name"
 	# Uses stat -c to get custom formatting and % to specify the information format sequence
 	echo "Owner: $(stat -c '%U' "$dir_name")"
 	echo "Group: $(stat -c '%G' "$dir_name")"
+	echo ""
 	echo "Permissions: $(stat -c '%a/%A' "$dir_name")"
-	echo "Sticky Bit: $(stat -c '%A' "$dir_name" | cut -c9)"
-	echo "Setgid: $(stat -c '%A' "$dir_name" | cut -c6)"
+	# Fetches permission string, defines empty list for results and defines last three in case there is sticky/sgid
+	perm_string="$(stat -c '%a' "$dir_name")"
+	octal="${perm_string: -3}"
+	perm_list=""
+	# For every number in the octal permissions, calculate permissions from chart, first owner, then group and lastly other
+	for (( i = 1; i <= 3; i++ )); do
+		# Selected character from octate
+		perm_number="${octal:i-1:1}"
+		# First number is owner, second group and third other
+		case $i in
+			1) perm_list+="Owner has: ";;
+			2) perm_list+="Group has: ";;
+			3) perm_list+="Others have: ";;
+		esac
+		# Chart of value
+		case $perm_number in
+			"7") perm_list+="read, write & execute\n";;
+			"6") perm_list+="read & write\n";;
+			"5") perm_list+="read & execute\n";;        
+			"4") perm_list+="read\n";;
+			"3") perm_list+="write & execute\n";;
+			"2") perm_list+="write\n";;
+			"1") perm_list+="execute\n";;
+			"0") perm_list+="no permissions\n";;
+		esac
+	done
+	# Echo out results from calculation
+	echo -e "$perm_list"
+	# If sticky bit or sgid is found in the permission string, echo on or off
+	perms_sgid="$(stat -c '%A' "$dir_name" | cut -c10)"
+	perms_stick="$(stat -c '%A' "$dir_name" | cut -c7)"
+	if [[ "$perms_sgid" == "t" || "$perms_sgid" == "T" ]]; then
+    	echo "Sticky Bit: ON"
+	else
+		echo "Sticky Bit: OFF"
+	fi
+	if [[ "$perms_stick" == "s" || "$perms_stick" == "S" ]]; then
+    	echo "Setgid: ON"
+	else
+		echo "Setgid: OFF"
+	fi
 	echo "Last Modified: $(stat -c '%y' "$dir_name" | cut -c-19)"
 }
+
 
 # Create a user group
 create_grp(){
@@ -732,7 +792,6 @@ while true; do
 
 	# View folder properties
 	"fv")
-		clear
 		folder_view
 		echo ""
 		read -rp "Press enter to continue..."
