@@ -66,7 +66,9 @@ print_help(){
 	echo -e "${red}fm${wht} - Modify folder properties"
 	echo -e "${red}fd${wht} - Delete a folder"
 	echo ""
+	echo -e "${grn}OTHER${wht}"
 	echo -e "${red}pkg${wht} - Install, Update or Remove packages"
+	echo -e ""
 	echo -e "${yel}ex${wht} - Exit the program"
 }
 
@@ -634,8 +636,17 @@ pkg_handler(){
 	echo "Choose what you would like to do:"
 	read -rp "> " pkg_choice
 
+	# ? Of course this won't work for everything as every distro uses a different
+	# ? package manager, maybe feature to add in the future.
 	if [[ "$pkg_choice" == "up" ]]; then
 		sudo apt-get update -y && apt-get upgrade -y
+	elif [[ "$pkg_choice" == "uo" ]]; then
+		sudo apt-get update
+	elif [[ "$pkg_choice" == "in" ]]; then
+		echo -e "Enter the package(s) you would like to install, separated by one space for each package."
+		read -rp "> " packages
+		sudo apt-get install $packages
+		read -rp "Press enter"
 	fi
 
 }
