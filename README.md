@@ -7,7 +7,7 @@ Such as: Creating files, Creating new users, Modifying files, Modifying user con
 
 This was made as the Case assignment for the DVA249 linux course at Mälardalens University.
 
-DISCLAIMER: This piece of software may be licensed under CC BY-NC 4.0 but using this software in order to complete the DVA249 Case assignment
+DISCLAIMER: This piece of software may be licensed under GPLv4 but using this software in order to complete the DVA249 Case assignment
 will count as plagiarism and you may get a failing grade.
 
-Linux Menu Manager © 2025 by Dino Brankovic & Simon Malmström is licensed under CC BY-NC 4.0 
+Linux Menu Manager © 2025 by Dino Brankovic & Simon Malmström is licensed under GPLv4
