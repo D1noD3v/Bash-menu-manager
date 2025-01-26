@@ -644,8 +644,9 @@ pkg_handler(){
 		sudo apt-get update
 	elif [[ "$pkg_choice" == "in" ]]; then
 		echo -e "Enter the package(s) you would like to install, separated by one space for each package."
-		read -rp "> " packages
-		sudo apt-get install $packages
+		read -rp "> " -a packages
+		echo $packages
+		sudo apt-get install "${packages[@]}" # TODO: get this working, currently can't take more than one package at a time.
 		read -rp "Press enter"
 	fi
 
