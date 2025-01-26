@@ -66,6 +66,7 @@ print_help(){
 	echo -e "${red}fm${wht} - Modify folder properties"
 	echo -e "${red}fd${wht} - Delete a folder"
 	echo ""
+	echo -e "${red}pkg${wht} - Install, Update or Remove packages"
 	echo -e "${yel}ex${wht} - Exit the program"
 }
 
@@ -621,15 +622,21 @@ group_modify(){
 
 # handles updating, installing and removing packages
 pkg_handler(){
-	echo "${yel}    Package handler    ${wht}"
+	clear
+	sysman_logo
+	echo -e "${yel}    Package handler    ${wht}"
 	echo ""
-	echo "1) Update & Upgrade"
-	echo "2) Update only"
-	echo "3) Install packages"
-	echo "4) Remove packges"
-	
+	echo -e "up) Update & Upgrade"
+	echo -e "uo) Update only"
+	echo -e "in) Install packages"
+	echo -e "re) Remove packges"
+
 	echo "Choose what you would like to do:"
-	read -rp "> "
+	read -rp "> " pkg_choice
+
+	if [[ "$pkg_choice" == "up" ]]; then
+		sudo apt-get update -y && apt-get upgrade -y
+	fi
 
 }
 
@@ -866,6 +873,11 @@ while true; do
 		fi
 		echo ""
 		read -rp "Press enter to continue..."
+		;;
+
+	"pkg")
+		clear
+		pkg_handler
 		;;
 
 	# If the selection is invalid
