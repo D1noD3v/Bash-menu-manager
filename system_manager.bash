@@ -619,6 +619,20 @@ group_modify(){
 	fi
 }
 
+# handles updating, installing and removing packages
+pkg_handler(){
+	echo "${yel}    Package handler    ${wht}"
+	echo ""
+	echo "1) Update & Upgrade"
+	echo "2) Update only"
+	echo "3) Install packages"
+	echo "4) Remove packges"
+	
+	echo "Choose what you would like to do:"
+	read -rp "> "
+
+}
+
 # Main loop
 while true; do
 
