@@ -39,7 +39,7 @@ yel='\e[1;33m'
 # Main menu UI
 print_help(){
 	echo -e "${blu}**************************************${wht}"
-	echo "       SYSTEM MANAGER (v1.0.69)          "
+	echo "       SYSTEM MANAGER (v0.1-beta)          "
 	echo -e "${blu}--------------------------------------${wht}"
 	echo ""
 	echo -e "${grn}NETWORK${wht}"
