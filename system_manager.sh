@@ -639,14 +639,16 @@ pkg_handler(){
 	# ? Of course this won't work for everything as every distro uses a different
 	# ? package manager, maybe feature to add in the future.
 	if [[ "$pkg_choice" == "up" ]]; then
-		sudo apt-get update -y && apt-get upgrade -y
+		apt-get update -y && apt-get upgrade -y
 	elif [[ "$pkg_choice" == "uo" ]]; then
-		sudo apt-get update
+		apt-get update
 	elif [[ "$pkg_choice" == "in" ]]; then
 		echo -e "Enter the package(s) you would like to install, separated by one space for each package."
-		read -rp "> " -a packages
-		echo $packages
-		sudo apt-get install "${packages[@]}" # TODO: get this working, currently can't take more than one package at a time.
+		read -rp "> " -a packages # read the packages the user wishes to install.
+		echo $packages > packages.txt 
+		xargs -a packages.txt apt-get install # install the packages listed in the file
+		rm packages.txt # remove the temporary file
+		echo ""
 		read -rp "Press enter"
 	fi
 
